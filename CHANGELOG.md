@@ -1,5 +1,10 @@
 # Changelog
 
+## 5.9.2 — 2026-11-14 (patch)
+- Fixed: in the **Recording** tab the footer buttons (**Save**, **Copy**, **Export .md**, **.json**, **Clear**) now sit
+  above the step count / version / © line, instead of dropping below it when the panel is narrow.
+- No new permissions.
+
 ## 5.9.1 — 2026-11-14 (patch)
 - Added: a **☕ Buy me a coffee** link in the panel footer of every tab (next to the © line). It opens
   buymeacoffee.com/anatolman in a new tab.
