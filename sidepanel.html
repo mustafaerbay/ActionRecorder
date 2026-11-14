@@ -1,0 +1,357 @@
+<!doctype html>
+<!--
+  Action Recorder — Chrome extension
+  Copyright (c) 2026 Mustafa Erbay. All rights reserved.
+  Proprietary and confidential. Unauthorized copying, modification or distribution of this file,
+  via any medium, is strictly prohibited. See the LICENSE file for details.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Action Recorder</title>
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+  <nav class="tabs">
+    <button id="tabRec" class="tab active">Recording</button>
+    <button id="tabFlows" class="tab">Saved flows <span id="flowCount" class="badge">0</span></button>
+    <button id="tabExtract" class="tab">Extract list</button>
+    <button id="tabShots" class="tab" title="Screenshot notes: mark elements on the page, add notes, export a PDF">📷 Screenshots</button>
+  </nav>
+
+  <!-- Recording -->
+  <section id="recView" class="view">
+    <header>
+      <div class="status">
+        <span id="dot" class="dot"></span>
+        <span id="statusText">Idle</span>
+        <span id="timer" class="timer">00:00</span>
+      </div>
+      <div class="controls">
+        <div class="addwrap">
+          <button id="addBtn" aria-haspopup="menu" aria-expanded="false" title="Add a step: If block, check, capture, approval, HTTP request, click, loop">+ Add ▾</button>
+          <div id="addMenu" class="addmenu" role="menu" hidden>
+          <button role="menuitem" id="ifBtn" hidden title="Add an If block: the steps of a case run only when its condition is true (a variable, a text on the page or the page URL)">⑂ If</button>
+          <button role="menuitem" id="testBtn" hidden title="Add a test step: a named test with an expected result and conditions that must all be true (a variable, a text on the page, the URL). Shown as PASS / FAIL in the Test steps table of the run report">🧪 Test step</button>
+          <button role="menuitem" id="checkBtn" hidden title="Add a step that verifies keywords exist (or not) on the page">✓ Check text</button>
+          <button role="menuitem" id="capBtn" hidden title="Read a value from an element on the page and keep it in a variable for later steps">⤓ Capture value</button>
+          <button role="menuitem" id="apprBtn" hidden title="Add a step that waits for your approval, or asks you for a value during the run">⏸ Approval</button>
+          <button role="menuitem" id="httpBtn" hidden title="Add a step that sends an HTTP request (GET / POST …), e.g. to notify a chat group or call an API">🌐 Request</button>
+          <button role="menuitem" id="clickBtn" hidden title="Add a click on a button WITHOUT clicking it now (e.g. Delete, Submit, Send) — it is clicked on replay">🖱 Add click</button>
+          <button role="menuitem" id="loopBtn" hidden title="Repeat the next steps for every item of a list">⟳ For each item</button>
+          </div>
+        </div>
+        <button id="secondary" hidden></button>
+        <button id="toggle" class="primary">● Start recording</button>
+        <button id="saveTop" class="save" hidden title="Save this recording as a flow (Saved flows tab)">💾 Save</button>
+      </div>
+    </header>
+
+    <form id="noteForm" class="note" hidden>
+      <input id="noteInput" type="text" placeholder="Add a note for the agent (e.g. wait until job is green)" maxlength="300">
+      <button type="submit">Add</button>
+    </form>
+
+    <div id="editBar" class="editbar" hidden>
+      <span>✎ Editing saved flow <b id="editName"></b> — change (✎), move (↑ ↓) or remove (×) steps; ⤵ on a step inserts new steps
+        after it, ▶ Continue adds them at the end. Nothing is saved until you press <b>Update flow</b>.</span>
+      <button type="button" id="stopEdit" title="Keep these steps as a normal recording, not linked to the saved flow">Stop editing</button>
+    </div>
+
+    <section id="ifForm" class="checkform" hidden></section>
+    <section id="httpForm" class="checkform" hidden></section>
+    <section id="testForm" class="checkform" hidden></section>
+    <div id="insBar" class="ifbar insbar" hidden>
+      <span id="insText"></span>
+      <button type="button" id="insEnd" title="New steps go at the end of the flow again">Back to the end</button>
+    </div>
+    <div id="ifBar" class="ifbar" hidden>
+      <span id="ifText"></span>
+      <span class="crow">
+        <button type="button" id="ifElif" title="Another case: the next steps run only if no case above ran and this condition is true">Else if…</button>
+        <button type="button" id="ifElse" title="The next steps run only if none of the cases above ran">Else</button>
+        <button type="button" id="ifEnd" class="primary" title="Steps recorded from now on run always again">End if</button>
+      </span>
+    </div>
+    <div id="loopBar" class="loopbar" hidden>
+      <div><b>⟳ Loop active</b> — record the steps for <b>one</b> item: click the item, add your checks, then go back to the list.
+        Press <b>End loop</b> when done.</div>
+      <div class="crow">
+        <span class="xinfo">Pagination: <b id="lpNextInfo">none</b></span>
+        <button type="button" id="lpPickNext">Pick Next button</button>
+        <button type="button" id="lpNoNext" hidden>No pagination</button>
+        <label class="check" id="lpPagesBox">Max pages <input type="number" id="lpMaxPages" value="20" min="1" max="500"></label>
+      </div>
+      <div class="crow">
+        <label class="check">Max items <input type="number" id="lpMax" value="100" min="1" max="2000"></label>
+        <select id="lpFail" title="When a step or check fails for an item">
+          <option value="continue">On failure: next item</option>
+          <option value="stop">On failure: stop</option>
+        </select>
+        <button id="lpEnd" class="primary">End loop</button>
+      </div>
+      <span id="lpMsg" class="xinfo"></span>
+    </div>
+
+    <form id="capForm" class="checkform" hidden>
+      <div class="chead"><b>⤓ Capture value</b><button type="button" id="cpClose" class="del" title="Close">×</button></div>
+      <div class="crow"><span class="xinfo">Element: <b id="cpEl">click one on the page…</b></span><button type="button" id="cpPick">Pick element</button></div>
+      <div class="crow">
+        <select id="cpWhat">
+          <option value="text">Visible text</option>
+          <option value="value">Field value (input / dropdown)</option>
+          <option value="attr">Attribute</option>
+        </select>
+        <input id="cpAttr" type="text" placeholder="href" size="10" hidden>
+      </div>
+      <input id="cpRegex" type="text" placeholder="Optional regex, e.g. #(\d+) — keeps the first ( ) group">
+      <div class="crow"><span class="xinfo">Save as</span> <input id="cpVar" type="text" placeholder="ORDER_ID" size="14"></div>
+      <div class="xinfo">Value now: <b id="cpPreview">—</b></div>
+      <div class="crow">
+        <button type="submit" class="primary">Add step</button>
+        <span id="cpMsg" class="xinfo"></span>
+      </div>
+    </form>
+
+    <form id="apprForm" class="checkform" hidden>
+      <div class="chead"><b>⏸ Approval step</b><button type="button" id="apClose" class="del" title="Close">×</button></div>
+      <select id="apMode">
+        <option value="approve">Wait for my approval (Approve / Reject)</option>
+        <option value="input">Ask me for a value during the run</option>
+      </select>
+      <input id="apText" type="text" maxlength="300" placeholder="Message, e.g. Check the deployment plan, then approve">
+      <div class="crow" id="apVarRow" hidden>
+        <span class="xinfo">Save the answer as</span> <input id="apVar" type="text" placeholder="OTP" size="12">
+        <label class="check"><input type="checkbox" id="apSecret"> 🔒 secret</label>
+      </div>
+      <div class="crow" id="apFillRow" hidden>
+        <label class="check"><input type="checkbox" id="apFillOn"> …and type it into a field:</label>
+        <b id="apFillName" class="xinfo">none</b>
+        <button type="button" id="apFillPick">Pick field</button>
+      </div>
+      <div class="crow">
+        <button type="submit" class="primary">Add step</button>
+        <span id="apMsg" class="xinfo"></span>
+      </div>
+    </form>
+
+    <details id="flowCheck" class="flowcheck" hidden></details>
+    <details id="varsBox" class="varsbox" hidden>
+      <summary>Variables of this flow <span id="varsInfo" class="xinfo"></span></summary>
+      <p class="xinfo">Use <b>{{NAME}}</b> in step values (✎). These are the flow's default values; an environment chosen at run time overrides them. 🔒 secret values are never stored — they are asked at every run.</p>
+      <div id="varsRows"></div>
+      <button type="button" id="varsAdd">+ Variable</button>
+    </details>
+
+    <form id="checkForm" class="checkform" hidden>
+      <div class="chead"><b>Check text</b><button type="button" id="ckClose" class="del" title="Close">×</button></div>
+      <textarea id="ckWords" rows="2" placeholder="Keywords — one per line (tip: select text on the page first)"></textarea>
+      <div class="crow">
+        <select id="ckMode" title="Pass when the keywords…">
+          <option value="present">must exist</option>
+          <option value="absent">must NOT exist</option>
+        </select>
+        <select id="ckMatch" title="How to match">
+          <option value="contains">contains</option>
+          <option value="word">whole word</option>
+          <option value="regex">regex</option>
+        </select>
+        <label class="check"><input type="checkbox" id="ckCase"> Match case</label>
+      </div>
+      <div class="crow">
+        <span class="xinfo">Look in: <b id="ckScope">whole page</b></span>
+        <button type="button" id="ckPick">Pick area</button>
+        <button type="button" id="ckClear" hidden>Whole page</button>
+      </div>
+      <div class="crow">
+        <button type="submit" class="primary" id="ckAdd">Add check</button>
+        <span id="ckMsg" class="xinfo"></span>
+      </div>
+    </form>
+
+    <main>
+      <ol id="steps"></ol>
+      <p id="empty" class="empty">Press <b>Start recording</b>, then use the page as usual.<br>Clicks, typing, selections, key presses and page changes show up here.</p>
+    </main>
+
+    <footer>
+      <span class="footinfo"><span id="count">0 steps</span> · <span class="version"></span> · <span class="credit"></span></span>
+      <div class="actions">
+        <button id="saveFlow" disabled title="Keep this recording in Saved flows so you can replay it">Save</button>
+        <button id="saveNew" hidden title="Save these steps as a new flow and leave the original unchanged">Save as new</button>
+        <button id="copyMd" disabled title="Copy Markdown to clipboard">Copy</button>
+        <button id="exportMd" disabled>Export .md</button>
+        <button id="exportJson" disabled>.json</button>
+        <button id="clear" disabled title="Delete this recording">Clear</button>
+      </div>
+    </footer>
+  </section>
+
+  <!-- Saved flows -->
+  <section id="flowsView" class="view" hidden>
+    <div class="toolbar">
+      <label class="check"><input type="checkbox" id="recordedWaits"> Replay with recorded waits</label>
+      <label class="check" title="Show a desktop notification when a replay needs you (approval, a value, a manual step, a failed step) and when it finishes"><input type="checkbox" id="notifyOn" checked> 🔔 Notify</label>
+      <button id="envBtn" title="Shared variable sets (DEV / TEST / PROD …) for all flows">Environments</button>
+      <button id="exportAllBtn" title="Download every saved flow (with its versions and history) and the environments as one .json backup. Secret values are never included.">Export all</button>
+      <button id="importBtn" title="Import a flow .json or an Export-all backup">Import .json</button>
+      <input id="importFile" type="file" accept=".json,application/json" multiple hidden>
+    </div>
+    <section id="envBox" class="envbox" hidden>
+      <div class="chead"><b>Environments</b> <span class="xinfo">shared by all flows — choose one when you run a flow</span>
+        <button type="button" id="envClose" class="del" title="Close">×</button></div>
+      <div id="envList"></div>
+      <div class="crow">
+        <button type="button" id="envAdd">+ New environment</button>
+        <button type="button" id="envExport">Export .json</button>
+        <button type="button" id="envImport">Import</button>
+        <input id="envFile" type="file" accept=".json,application/json" hidden>
+      </div>
+    </section>
+
+    <section id="runForm" class="envbox" hidden>
+      <div class="chead"><b id="rfTitle">Run</b><button type="button" id="rfClose" class="del" title="Cancel">×</button></div>
+      <label class="check">Environment <select id="rfEnv"></select></label>
+      <div id="rfRows"></div>
+      <label class="check" id="rfRememberRow" hidden title="Encrypted, only in this Chrome profile on this computer. Never in a flow, an export or a report."><input type="checkbox" id="rfRemember" checked> 🔑 Remember the 🔒 values I type, on this computer (<span id="rfRememberScope"></span>)</label>
+      <div id="rfChainInfo" class="xinfo" hidden></div>
+      <label class="check" id="rfChainRow" hidden>If a flow fails:
+        <select id="rfOnFail"><option value="stop">stop the chain</option><option value="continue">continue with the next flow</option></select></label>
+      <div class="crow">
+        <button type="button" id="rfRun" class="primary">▶ Run</button>
+        <button type="button" id="rfCancel">Cancel</button>
+        <span id="rfMsg" class="xinfo"></span>
+      </div>
+    </section>
+
+    <div class="flowsearch">
+      <input id="flowSearch" type="search" placeholder="🔍 Search flows (name, description, group)">
+      <span id="flowSearchInfo" class="xinfo"></span>
+      <button id="newGroupBtn" title="Create a group to organise related flows">+ Group</button>
+    </div>
+    <main>
+      <ul id="flows"></ul>
+      <p id="flowsEmpty" class="empty">No saved flows yet.<br>Stop a recording and press <b>Save</b>, or import a <b>.json</b> export.</p>
+    </main>
+    <footer>
+      <span class="footinfo"><span class="version"></span> · <span class="credit"></span></span>
+    </footer>
+  </section>
+
+  <!-- Extract list -->
+  <!-- 📷 Screenshot notes -->
+  <section id="shotView" class="view" hidden>
+    <main class="xmain">
+      <div class="xstep">
+        <div class="xhead">📷 Screenshot notes</div>
+        <p class="xinfo">Mark an element on the page — the screenshot gets a red frame with a number — and write a note.
+          Repeat for as many screens as you need, then export everything as one PDF.</p>
+        <label class="shtitle">Title <input id="shTitle" type="text" placeholder="e.g. Order page — review notes"></label>
+        <div class="actions">
+          <button id="shPick" class="primary" title="Click an element on the page (↑ / ↓ make the frame bigger / smaller). A screenshot is taken with a red frame around it.">▣ Mark an element</button>
+          <button id="shFull" title="Take a screenshot of the visible page without marking anything">📷 Whole screen</button>
+        </div>
+        <p id="shMsg" class="xinfo"></p>
+      </div>
+      <ol id="shList" class="shlist"></ol>
+      <div class="xstep shfoot" id="shFoot" hidden>
+        <div class="actions">
+          <button id="shPdf" class="primary">⤓ Export PDF</button>
+          <button id="shDocx" title="Word document: the screenshots with their frames, and the notes as text you can edit">⤓ Word (.docx)</button>
+          <button id="shMd" title="Markdown: a .zip with notes.md and an images/ folder (for Git, wikis, Obsidian, VS Code…)">⤓ Markdown (.zip)</button>
+          <button id="shClear">Clear all</button>
+        </div>
+      </div>
+    </main>
+  </section>
+
+  <section id="extractView" class="view" hidden>
+    <main class="xmain">
+      <div class="xstep">
+        <div class="xhead"><span class="xnum">1</span> List</div>
+        <p id="xListInfo" class="xinfo">Pick one item of the list in the page. All items like it are highlighted while you hover.</p>
+        <div class="actions">
+          <button id="xPick" class="primary">⊞ Pick list item</button>
+          <button id="xShow" hidden>Show on page</button>
+        </div>
+        <div id="xPreview" class="xtable" hidden></div>
+      </div>
+
+      <div class="xstep" id="xNextBox" hidden>
+        <div class="xhead"><span class="xnum">2</span> Pagination</div>
+        <p id="xNextInfo" class="xinfo"></p>
+        <div class="actions">
+          <button id="xPickNext">Pick Next button</button>
+          <button id="xNoNext">No pagination</button>
+        </div>
+        <label class="check xmax">Max pages <input id="xMax" type="number" min="1" max="500" value="20"></label>
+      </div>
+
+      <div class="xstep" id="xRunBox" hidden>
+        <div class="xhead"><span class="xnum">3</span> Extract</div>
+        <p id="xRecInfo" class="xinfo"></p>
+        <div class="actions">
+          <button id="xRun" class="primary">Extract all pages</button>
+          <button id="xStop" hidden>■ Stop</button>
+        </div>
+        <p id="xProgress" class="xinfo"></p>
+        <div id="xResult" hidden>
+          <div class="actions">
+            <button id="xCsv">Download .csv</button>
+            <button id="xJson">.json</button>
+            <button id="xMd">Copy as Markdown</button>
+          </div>
+          <div id="xData" class="xtable"></div>
+        </div>
+      </div>
+    </main>
+    <footer>
+      <span class="footinfo"><span class="version"></span> · <span class="credit"></span></span>
+    </footer>
+  </section>
+
+  <!-- Replay -->
+  <section id="replayView" class="view" hidden>
+    <header>
+      <div class="status">
+        <span id="rDot" class="dot on"></span>
+        <span id="rTitle" class="rtitle">Replaying</span>
+      </div>
+      <button id="rStop">■ Stop</button>
+    </header>
+    <div id="rBar" class="rbar">
+      <span id="rMsg"></span>
+      <div class="actions">
+        <button id="rData" hidden>Download extracted data</button>
+        <button id="rReport" hidden title="Report of this run: every step with its result, checks, loop items, variables">Download run report</button>
+        <button id="rApprove" class="primary" hidden>✓ Approve</button>
+        <button id="rReject" hidden>✗ Reject</button>
+        <span id="rInputBox" class="crow" hidden><input id="rInput" type="text" size="16"><button id="rInputOk" class="primary">OK</button><button id="rInputCancel">Cancel</button></span>
+        <button id="rStep" class="primary" hidden title="Run the next step, then pause again">Step ▸</button>
+        <button id="rResume" hidden title="Run until the next breakpoint (●) or the end">Continue ⏩</button>
+        <button id="rContinue" class="primary" hidden>Continue</button>
+        <button id="rRetry" hidden>Retry</button>
+        <button id="rSkip" hidden>Skip</button>
+        <button id="rClose" hidden>Close</button>
+      </div>
+    </div>
+    <ol id="rChain" class="rchain" hidden></ol>
+    <div id="rHint" class="rhint" hidden>🐞 Debug mode — click a step number to set or remove a breakpoint ●</div>
+    <main>
+      <ol id="rSteps"></ol>
+    </main>
+    <footer>
+      <span class="footinfo"><span class="version"></span> · <span class="credit"></span></span>
+    </footer>
+  </section>
+
+  <script src="format.js"></script>
+  <script src="extract.js"></script>
+  <script src="replay.js"></script>
+  <script src="vault.js"></script>
+  <script src="sidepanel.js"></script>
+  <script src="pdf.js"></script>
+  <script src="docx.js"></script>
+  <script src="screenshots.js"></script>
+</body>
+</html>
