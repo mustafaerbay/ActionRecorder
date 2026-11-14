@@ -2697,6 +2697,14 @@ chrome.storage.onChanged.addListener((changes, area) => {
 document.querySelectorAll('.version').forEach((n) => { n.textContent = 'v' + chrome.runtime.getManifest().version; });
 document.querySelectorAll('.credit').forEach((n) => {
   n.textContent = `© ${new Date().getFullYear()} Mustafa Erbay. All rights reserved.`;
+  const coffee = document.createElement('a');
+  coffee.className = 'coffee';
+  coffee.href = 'https://buymeacoffee.com/anatolman';
+  coffee.target = '_blank';
+  coffee.rel = 'noopener noreferrer';
+  coffee.textContent = '☕ Buy me a coffee';
+  coffee.title = 'Support Action Recorder';
+  n.after(' · ', coffee);
 });
 chrome.storage.local.get({ ...DEFAULTS, flows: [], envs: [], groups: [] }).then((s) => {
   flows = s.flows;

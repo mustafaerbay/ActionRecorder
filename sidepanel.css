@@ -213,6 +213,8 @@ li.step.loopmark .verb { color: var(--nav); }
 
 /* ---------- credit ---------- */
 .credit { color: var(--muted); font-size: 11px; white-space: nowrap; }
+.coffee { color: var(--nav); font-size: 11px; font-weight: 600; white-space: nowrap; text-decoration: none; }
+.coffee:hover { text-decoration: underline; }
 
 /* ---------- editing saved flows ---------- */
 .editbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
