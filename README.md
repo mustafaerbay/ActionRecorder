@@ -3,7 +3,7 @@
 Records what you do in the browser and exports it as a Markdown step list that an automation agent (e.g. Claude in Chrome) can replay.
 
 ## Install
-1. Unzip `action-recorder.zip`.
+1. Download the latest `ActionRecorder-v<version>.zip` from the [Releases](https://github.com/mustafaerbay/ActionRecorder/releases) page and unzip it.
 2. Open `chrome://extensions`, turn on **Developer mode**.
 3. Click **Load unpacked** and pick the unzipped folder.
 4. Pin the extension; clicking its icon opens the side panel.
@@ -221,6 +221,9 @@ The version in `manifest.json` follows `MAJOR.MINOR.PATCH` and is shown in the p
 - **MAJOR**: breaking change, e.g. the export/JSON format changes, a feature is removed, or new permissions are needed.
 - **MINOR**: a new feature that keeps old recordings and exports working.
 - **PATCH**: a bug fix or small UI tweak.
+
+## Support
+If Action Recorder saves you time, you can [☕ buy me a coffee](https://buymeacoffee.com/anatolman) — the link is also in the panel footer.
 
 ---
 © 2026 Mustafa Erbay. All rights reserved. Proprietary software — see [LICENSE](LICENSE).

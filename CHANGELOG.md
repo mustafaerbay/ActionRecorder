@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.9.1 — 2026-11-14 (patch)
+- Added: a **☕ Buy me a coffee** link in the panel footer of every tab (next to the © line). It opens
+  buymeacoffee.com/anatolman in a new tab.
+- Changed: releases are published on the GitHub **Releases** page as `ActionRecorder-v<version>.zip`, with the
+  install steps in the release notes.
+- No new permissions.
+
 ## 5.9.0 — 2026-11-06 (minor)
 - Added: **⤓ Markdown (.zip)** in the 📷 Screenshots tab — a .zip with `notes.md` and an `images/` folder
   (`screen-01.jpg`, … with the red numbered frames). The notes are a Markdown list per screen (`**[1]** note — _element_`),

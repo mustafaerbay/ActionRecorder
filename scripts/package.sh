@@ -30,7 +30,7 @@ zip_name="ActionRecorder-v$version.zip"
 
 # Every tracked file except repo-only ones (docs, CI, scripts, dotfiles).
 git ls-files \
-  | grep -vE '^(\.|README\.md$|CHANGELOG\.md$|scripts/|dist/)' \
+  | grep -vE '^(\.|README\.md$|CHANGELOG\.md$|CLAUDE\.md$|scripts/|dist/)' \
   | grep -vE '(^|/)\.DS_Store$' \
   | zip -q -X "dist/$zip_name" -@
 

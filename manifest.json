@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Action Recorder",
-  "version": "5.9.0",
+  "version": "5.9.1",
   "description": "Record browser actions, extract paginated lists, save and replay flows, or export them as Markdown for an automation agent.",
   "author": "Mustafa Erbay",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA30fT1Vk8cV2rGKiMlgxYcY94/hA0b/BBhswDjStHUWBowjvxb7HyJBDeFHKYxpkdaxxPmIZJXDPktMhV+YnxS5+E57ptk8lze5fYdcX/oFEyrMu664eTaupsdcojWhp7prUjYt8DoqBbpCRd5uy/F3fe9AQNXy8DRPcSYmP3vvee8GlFQ58DYOX4M+uS2U9wyaZ8qL97Sm0ADtQfUCmoMBKwlbY2XejyxHY7LkIMphSlR0K4TmWcRXKEF0XvG93g54vcjNiP+nm6Ajg0KK7V+33CojsjaajWKu7TpPxdBV5CGLfiyZrIazyZuqTIX4fqQ44N9gytw5gqZVkHN60sUQIDAQAB",
