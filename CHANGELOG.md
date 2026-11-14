@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.9.3 — 2026-11-15 (patch)
+- Changed: the **☕ Buy me a coffee** link in the panel footer now opens buymeacoffee.com/mustafaerbay.
+- No new permissions.
+
 ## 5.9.2 — 2026-11-14 (patch)
 - Fixed: in the **Recording** tab the footer buttons (**Save**, **Copy**, **Export .md**, **.json**, **Clear**) now sit
   above the step count / version / © line, instead of dropping below it when the panel is narrow.

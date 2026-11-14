@@ -223,7 +223,7 @@ The version in `manifest.json` follows `MAJOR.MINOR.PATCH` and is shown in the p
 - **PATCH**: a bug fix or small UI tweak.
 
 ## Support
-If Action Recorder saves you time, you can [☕ buy me a coffee](https://buymeacoffee.com/anatolman) — the link is also in the panel footer.
+If Action Recorder saves you time, you can [☕ buy me a coffee](https://buymeacoffee.com/mustafaerbay) — the link is also in the panel footer.
 
 ---
 © 2026 Mustafa Erbay. All rights reserved. Proprietary software — see [LICENSE](LICENSE).
