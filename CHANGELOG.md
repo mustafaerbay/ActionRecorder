@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.9.4 — 2026-11-24 (patch)
+- Changed: the README on GitHub now opens with four posters made from the real side panel — **Record once, replay
+  with new values**, **Clicks → an AI prompt**, **Your UI test, already written** and **Group, share, import** — and a
+  download link to the latest release. The extension itself is unchanged.
+- No new permissions.
+
 ## 5.9.3 — 2026-11-15 (patch)
 - Changed: the **☕ Buy me a coffee** link in the panel footer now opens buymeacoffee.com/mustafaerbay.
 - No new permissions.

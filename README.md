@@ -1,6 +1,20 @@
 # Action Recorder (Chrome extension)
 
+Record what you do in the browser once — replay it with new values, hand it to an AI agent as a prompt, or keep it as a UI test.
+
+<p align="center">
+  <img src="docs/images/1-replay.png" width="100%" alt="Record once. Replay with new values — the side panel with a recorded flow and its variables">
+</p>
+<p align="center">
+  <img src="docs/images/2-prompt.png" width="32%" alt="Clicks to an AI prompt — the Markdown export an agent can follow">
+  <img src="docs/images/3-test.png" width="32%" alt="Your UI test, already written — test steps and a run report">
+  <img src="docs/images/4-share.png" width="32%" alt="Group, share, import — saved flows in groups, exported as .json">
+</p>
+<p align="center"><b><a href="https://github.com/mustafaerbay/ActionRecorder/releases/latest">⤓ Download the latest release</a></b> · free · works in Chrome</p>
+
 Records what you do in the browser and exports it as a Markdown step list that an automation agent (e.g. Claude in Chrome) can replay.
+
+The posters above are rendered from the real side panel with sample data: `scripts/posters.sh` (sources in `docs/posters/`).
 
 ## Install
 1. Download the latest `ActionRecorder-v<version>.zip` from the [Releases](https://github.com/mustafaerbay/ActionRecorder/releases) page and unzip it.

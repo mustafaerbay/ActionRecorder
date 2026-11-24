@@ -28,9 +28,9 @@ rm -rf dist
 mkdir -p dist
 zip_name="ActionRecorder-v$version.zip"
 
-# Every tracked file except repo-only ones (docs, CI, scripts, dotfiles).
+# Every tracked file except repo-only ones (docs, posters, CI, scripts, dotfiles).
 git ls-files \
-  | grep -vE '^(\.|README\.md$|CHANGELOG\.md$|CLAUDE\.md$|scripts/|dist/)' \
+  | grep -vE '^(\.|README\.md$|CHANGELOG\.md$|CLAUDE\.md$|scripts/|dist/|docs/)' \
   | grep -vE '(^|/)\.DS_Store$' \
   | zip -q -X "dist/$zip_name" -@
 

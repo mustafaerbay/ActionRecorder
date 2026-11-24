@@ -1,0 +1,92 @@
+<!doctype html>
+<!-- README posters 2–4: one 2700×1200 panorama, rendered as three 900×1200 posters (?part=2|3|4). -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Action Recorder</title>
+<link rel="stylesheet" href="poster.css">
+<script>window.onerror = (msg) => { document.title = 'ERROR: ' + msg; };</script>
+<style>
+  body { background: var(--ink); }
+  #strip { position: absolute; left: 0; top: 0; width: 2700px; height: 1200px; }
+  .bg { position: absolute; top: 0; height: 1200px; width: 900px; }
+  .headline { position: absolute; top: 96px; width: 780px; }
+  .headline .h { font-size: 96px; }
+  .headline .h em { font-size: 190px; margin: 2px 0 0 -6px; }
+  .num { position: absolute; top: 60px; font-weight: 800; font-size: 22px; letter-spacing: .1em; opacity: .55; }
+
+  /* 2 — AI prompt */
+  .p2 { left: 40px; top: 520px; width: 430px; height: 760px; transform: rotate(-5deg); }
+  .md { left: 300px; top: 450px; width: 570px; transform: rotate(3deg); font-size: 17px; line-height: 1.6; white-space: pre; overflow: hidden; height: 600px; }
+  .md .hd { color: var(--orange-deep); font-weight: 600; }
+  .md .var { color: #7a3ed6; }
+  .arrow { left: 380px; top: 400px; font-size: 120px; transform: rotate(18deg); background: none; box-shadow: none; color: var(--orange); }
+  .agent { left: 250px; top: 1080px; transform: rotate(-3deg); font-size: 30px; }
+
+  /* 3 — UI test */
+  .p3 { left: 1370px; top: 470px; width: 450px; height: 640px; transform: rotate(5deg); }
+  .report { left: 1200px; top: 820px; width: 520px; transform: rotate(-4deg); font-size: 26px; }
+  .report .t { font-size: 18px; letter-spacing: .08em; text-transform: uppercase; opacity: .6; margin-bottom: 12px; }
+  .report .row { display: flex; gap: 14px; align-items: center; padding: 9px 0; border-top: 1px dashed rgba(0,0,0,.2); }
+  .report .ok { background: var(--green); color: var(--ink); border-radius: 8px; padding: 2px 10px; font-size: 20px; }
+  .report .sum { margin-top: 12px; font-size: 36px; }
+  .report .sum b { color: #138a4b; }
+
+  /* 4 — share */
+  .p4 { left: 2130px; top: 500px; width: 450px; height: 760px; transform: rotate(-5deg); }
+  .file { left: 1980px; top: 560px; transform: rotate(-8deg); display: flex; gap: 16px; align-items: center; font-size: 30px; padding: 20px 26px; }
+  .file .ic { width: 54px; height: 66px; border-radius: 8px; background: var(--ink); color: var(--orange); display: grid; place-items: center; font-size: 15px; }
+  .import { left: 2380px; top: 420px; transform: rotate(8deg); }
+  .groups { left: 1960px; top: 960px; transform: rotate(4deg); font-size: 26px; }
+</style>
+</head>
+<body>
+<div id="strip">
+  <div class="bg dark" style="left:0"></div>
+  <div class="bg dark" style="left:900px;background:#191919"></div>
+  <div class="bg orange" style="left:1800px"></div>
+
+  <!-- 2 -->
+  <div class="num" style="left:70px;color:#fff">FOR AI AGENTS</div>
+  <div class="headline dark" style="left:70px;background:none"><div class="h">Clicks → an<em>AI prompt</em></div></div>
+  <iframe class="panel p2" src="panel.html?scene=rec"></iframe>
+  <div class="pop card md mono" id="md"></div>
+  <div class="pop pill orange agent">Paste into any AI agent</div>
+
+  <!-- 3 -->
+  <div class="num" style="left:970px;color:#fff">FOR QA</div>
+  <div class="headline dark" style="left:970px;background:none"><div class="h">Your UI test,<em style="font-size:150px">already written</em></div></div>
+  <iframe class="panel p3" src="panel.html?scene=test"></iframe>
+  <div class="pop card report">
+    <div class="t">Run report · Login smoke test</div>
+    <div class="row"><span class="ok">PASS</span> Dashboard opens</div>
+    <div class="row"><span class="ok">PASS</span> No error banner</div>
+    <div class="sum"><b>2 / 2</b> checks passed</div>
+  </div>
+
+  <!-- 4 -->
+  <div class="num" style="left:1870px">FOR TEAMS</div>
+  <div class="headline orange" style="left:1870px;background:none"><div class="h">Group.<em>Share.</em>Import.</div></div>
+  <iframe class="panel p4" src="panel.html?scene=flows&amp;view=flows"></iframe>
+  <div class="pop card file"><span class="ic mono">JSON</span>create-order.json</div>
+  <div class="pop pill ink import">⤓ Import .json</div>
+  <div class="pop pill white groups">📁 Onboarding · Billing · Smoke tests</div>
+</div>
+
+<script src="../../format.js"></script>
+<script src="scenes.js"></script>
+<script>
+  // The card shows the real Markdown export of the sample flow (format.js → toMarkdown), shortened to fit.
+  const keep = (l) => /^(# |## (Variables|Steps)|\| `|- \d+\.)/.test(l);
+  const short = (l) => l.replace(/ — selector `[^`]*`/, '').replace(/ — replace what the field contains/, '').replace(/ _\(.*$/, '');
+  const esc = (t) => t.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  document.getElementById('md').innerHTML = toMarkdown(SCENES.rec).split('\n').filter(keep).map(short)
+    .map((l) => esc(l.length > 50 ? l.slice(0, 49) + '…' : l))
+    .map((l) => (/^#/.test(l) ? `<span class="hd">${l}</span>` : l.replace(/\{\{\w+\}\}/g, (v) => `<span class="var">${v}</span>`)))
+    .join('\n');
+  const part = Number(new URLSearchParams(location.search).get('part') || 0);
+  if (part) document.getElementById('strip').style.left = `${-900 * (part - 2)}px`;
+</script>
+<script src="ready.js"></script>
+</body>
+</html>

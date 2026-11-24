@@ -1,0 +1,42 @@
+/* README posters — shared look. Rendered by scripts/posters.sh; not part of the extension. */
+@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,500;0,800;0,900;1,800&family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;600&display=block');
+
+:root {
+  --orange: #ff5a1f;
+  --orange-deep: #e0400a;
+  --ink: #111111;
+  --ink-2: #1c1c1e;
+  --paper: #fff4ec;
+  --green: #2fbf71;
+  --white: #ffffff;
+}
+* { box-sizing: border-box; margin: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; }
+body { font-family: 'Inter Tight', system-ui, sans-serif; -webkit-font-smoothing: antialiased; position: relative; }
+.orange { background: var(--orange); color: var(--ink); }
+.dark { background: var(--ink); color: var(--white); }
+
+/* Headlines: short, heavy, the key word huge and italic. */
+.h { font-weight: 900; letter-spacing: -0.02em; word-spacing: 0.06em; line-height: 0.92; }
+.h em { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; letter-spacing: -0.02em; display: block; line-height: 0.82; }
+.dark .h em { color: var(--orange); }
+.orange .h em { color: var(--white); }
+.kicker { font-weight: 800; font-size: 22px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.75; }
+
+/* The real side panel, as a device-like card. */
+.panel {
+  position: absolute; border: 0; border-radius: 22px; background: #1e1f22;
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.45), 0 0 0 10px #000, 0 0 0 11px rgba(255, 255, 255, 0.12);
+}
+
+/* Things that pop out of the frame. */
+.pop {
+  position: absolute; border-radius: 18px; font-weight: 800; box-shadow: 0 24px 50px rgba(0, 0, 0, 0.35);
+}
+.pill { padding: 18px 30px; border-radius: 999px; font-size: 34px; white-space: nowrap; }
+.pill.ink { background: var(--ink); color: var(--white); }
+.pill.white { background: var(--white); color: var(--ink); }
+.pill.orange { background: var(--orange); color: var(--ink); }
+.pill.green { background: var(--green); color: var(--ink); }
+.card { background: var(--paper); color: var(--ink); padding: 26px 30px; }
+.mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
